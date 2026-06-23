@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      # 시드니 리전 ECR 창고에 로그인하는 명령어 (기존 코드에 있던 것 유지)
+      - aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 416225317325.dkr.ecr.ap-southeast-2.amazonaws.com
+      - echo Extracting Git Commit Hash...
+      # ⭐️ Git 커밋 번호 앞 7자리 잘라서 변수에 저장
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      # ⭐️ 말줄임표를 지우고 풀 주소로 완벽하게 매핑한 빌드 명령
+      - docker build -t 416225317325.dkr.ecr.ap-southeast-2.amazonaws.com/$ImageName:$IMAGE_TAG .
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      # ⭐️ 창고에 커밋 번호 이름표를 달고 업로드
+      - docker push 416225317325.dkr.ecr.ap-southeast-2.amazonaws.com/$ImageName:$IMAGE_TAG
+      - echo Writing image definitions file...
+      # ⭐️ ECS 배포용 JSON 쪽지도 동적으로 생성
+      - printf '[{"name":"frontend-container","imageUri":"416225317325.dkr.ecr.ap-southeast-2.amazonaws.com/%s:%s"}]' $ImageName $IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
