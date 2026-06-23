@@ -15,6 +15,6 @@ phases:
       - echo "This is the finally block execution!"
 
 artifacts:
-  base-directory: .
+  base-directory: dist
   files:
-    - "dist/**/*"
+    - "**/*"
