@@ -1,0 +1,24 @@
+# mini-project-06/Frontend CI — build image, push to ECR user112-bookapp-frontend
+version: 0.2
+env:
+  variables:
+    AWS_REGION: ap-northeast-2
+    ECR_REPO: user112-bookapp-frontend
+phases:
+  pre_build:
+    commands:
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - REGISTRY=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REGISTRY
+      - IMAGE_TAG=$(echo "${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}" | cut -c1-12)
+  build:
+    commands:
+      - docker build --network=host --build-arg VITE_API_URL=/api -t $REGISTRY/$ECR_REPO:$IMAGE_TAG -t $REGISTRY/$ECR_REPO:latest .
+  post_build:
+    commands:
+      - docker push $REGISTRY/$ECR_REPO:$IMAGE_TAG
+      - docker push $REGISTRY/$ECR_REPO:latest
+      - printf '[{"name":"book-app","imageUri":"%s"}]' "$REGISTRY/$ECR_REPO:$IMAGE_TAG" > imagedefinitions.json
+artifacts:
+  files:
+    - imagedefinitions.json
