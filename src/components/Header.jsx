@@ -87,6 +87,11 @@ function Header() {
         <h1 onClick={() => navigate('/')} style={{ margin: 0 }}>
           📚 오늘의 서재
         </h1>
+        <span style={{
+          fontSize: '11px', fontWeight: 700, padding: '2px 8px',
+          borderRadius: '12px', background: 'var(--primary-color)',
+          color: 'white', letterSpacing: '0.5px'
+        }}>v2.0</span>
         <div style={{ width: '1px', height: '24px', background: 'rgba(0,0,0,0.08)', margin: '0 4px' }} />
         <button className="btn-new" onClick={() => navigate('/books')}>도서 목록</button>
         <button className="btn-new" onClick={() => navigate('/books/new')}>도서 등록</button>
