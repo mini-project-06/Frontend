@@ -268,7 +268,7 @@ cp .env.example .env
 예시:
 
 ```text
-VITE_API_URL=http://localhost:8080
+VITE_API_URL=/api
 ```
 
 ### 2. push / merge 시 자동 반영 방식
@@ -288,12 +288,19 @@ VITE_API_URL=http://localhost:8080
 AWS Console에서 CodeBuild 프로젝트에 아래 환경변수를 한 번 등록해 두세요.
 
 ```text
-VITE_API_URL=https://your-api-domain
+VITE_API_URL=/api
 ```
 
 등록 위치:
 
 - `CodeBuild > 프로젝트 선택 > Edit > Environment > Additional configuration > Environment variables`
+
+CloudFront 권장 구성:
+
+- 기본 origin: S3
+- 추가 origin: ALB
+- behavior: `/api/*` -> ALB
+- 프런트 API 주소: `/api`
 
 ### 4. 확인 포인트
 
