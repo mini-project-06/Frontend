@@ -1,5 +1,10 @@
 version: 0.2
 
+env:
+  parameter-store:
+    VITE_API_URL: "/book-app/prod/VITE_API_URL"
+    VITE_OPENAI_API_KEY: "/book-app/prod/VITE_OPENAI_API_KEY"
+
 phases:
   install:
     runtime-versions:
@@ -7,6 +12,8 @@ phases:
   pre_build:
     commands:
       - npm ci
+      - chmod +x scripts/sync-codebuild-env.sh
+      - ./scripts/sync-codebuild-env.sh
   build:
     commands:
       - npm run build
