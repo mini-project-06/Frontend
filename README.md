@@ -251,7 +251,7 @@ git clone [https://github.com/Jiae-Ham/AivleSchool_miniproj4.git](https://github
 ## ☁️ CodePipeline 배포 환경변수 반영 절차
 
 이 프론트엔드는 Vite 기반이므로 `VITE_*` 환경변수는 서버 실행 시점이 아니라 `npm run build` 시점에 정적 파일로 주입됩니다.  
-로컬 개발은 `.env`로 진행하고, 배포 빌드는 AWS Systems Manager Parameter Store 값을 CodeBuild가 자동 주입하도록 구성하는 것을 권장합니다.
+로컬 개발은 `.env`로 진행하고, 배포 빌드는 AWS CodeBuild 프로젝트 환경변수에서 값을 주입하는 방식으로 구성합니다.
 
 현재 빌드 설정은 `buildspec.yml`의 `pre_build` 단계에서 아래 값을 읽어 `.env.production` 파일을 자동 생성하도록 구성되어 있습니다.
 
@@ -274,39 +274,28 @@ VITE_API_URL=http://localhost:8080
 ### 2. push / merge 시 자동 반영 방식
 
 배포 환경에서는 `.env` 파일을 Git에 올리지 않습니다.  
-대신 CodeBuild가 매 빌드 때 SSM Parameter Store에서 값을 읽어 자동으로 환경변수로 등록합니다.
-
-현재 `buildspec.yml`에는 아래 매핑이 들어 있습니다.
-
-```yaml
-env:
-  parameter-store:
-    VITE_API_URL: "/book-app/prod/VITE_API_URL"
-```
+대신 CodeBuild 프로젝트에 등록된 환경변수를 빌드 시점에 자동으로 읽습니다.
 
 즉, `main` 브랜치 push나 merge로 CodePipeline이 실행되면:
 
 1. `CodePipeline`에서 사용하는 `CodeBuild` 프로젝트로 이동합니다.
-2. 빌드 시작 시 CodeBuild가 SSM Parameter Store에서 값을 읽습니다.
+2. 빌드 시작 시 CodeBuild가 프로젝트 환경변수 `VITE_API_URL`을 읽습니다.
 3. 읽은 값으로 `.env.production`을 생성합니다.
 4. `npm run build`가 그 값을 정적 산출물에 반영합니다.
 
 ### 3. 최초 1회 AWS 설정
 
-AWS Console 또는 CLI에서 아래 파라미터를 한 번 만들어 두세요.
+AWS Console에서 CodeBuild 프로젝트에 아래 환경변수를 한 번 등록해 두세요.
 
 ```text
-/book-app/prod/VITE_API_URL
+VITE_API_URL=https://your-api-domain
 ```
 
-권장값 유형:
+등록 위치:
 
-- `VITE_API_URL`: `String`
-
-또한 CodeBuild 서비스 역할에 아래 권한이 있어야 합니다.
-
-- `ssm:GetParameters`
+- `CodeBuild > 프로젝트 선택 > Edit > Environment > Additional configuration > Environment variables`
 
 ### 4. 확인 포인트
 
 - 프런트엔드 정적 배포물은 빌드 후 값이 고정되므로, 환경변수를 바꾼 뒤에는 반드시 파이프라인을 다시 실행해야 합니다.
+- `VITE_API_URL`이 비어 있으면 `scripts/sync-codebuild-env.sh`가 빌드를 실패시키도록 되어 있으므로, 잘못된 값으로 배포되는 일을 막을 수 있습니다.

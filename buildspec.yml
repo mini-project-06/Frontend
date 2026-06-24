@@ -1,9 +1,5 @@
 version: 0.2
 
-env:
-  parameter-store:
-    VITE_API_URL: "/book-app/prod/VITE_API_URL"
-
 phases:
   install:
     runtime-versions:
