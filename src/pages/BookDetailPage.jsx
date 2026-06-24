@@ -110,6 +110,10 @@ function BookDetailPage() {
   };
 
   const handleReviewDelete = async (reviewId) => {
+    if (!deletePassword.trim()) {
+      alert('비밀번호를 입력해주세요.');
+      return;
+    }
     try { //DB로 변경하면서 생기는 오류 처리 => GET으로 처리
       const res = await deleteReview(reviewId, deletePassword);
       if (!res.ok) {
