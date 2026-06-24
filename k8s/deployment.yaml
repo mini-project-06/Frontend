@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: book-app
-        image: 416225317325.dkr.ecr.ap-southeast-2.amazonaws.com/user112-bookapp-frontend:9a4b4b02c4e4
+        image: 416225317325.dkr.ecr.ap-southeast-2.amazonaws.com/user112-bookapp-frontend:9d64284f82f5
         imagePullPolicy: Always
         ports:
         - containerPort: 80
