@@ -256,7 +256,6 @@ git clone [https://github.com/Jiae-Ham/AivleSchool_miniproj4.git](https://github
 현재 빌드 설정은 `buildspec.yml`의 `pre_build` 단계에서 아래 값을 읽어 `.env.production` 파일을 자동 생성하도록 구성되어 있습니다.
 
 - `VITE_API_URL`
-- `VITE_OPENAI_API_KEY`
 
 ### 1. 로컬 개발
 
@@ -270,7 +269,6 @@ cp .env.example .env
 
 ```text
 VITE_API_URL=http://localhost:8080
-VITE_OPENAI_API_KEY=your-local-openai-key
 ```
 
 ### 2. push / merge 시 자동 반영 방식
@@ -284,7 +282,6 @@ VITE_OPENAI_API_KEY=your-local-openai-key
 env:
   parameter-store:
     VITE_API_URL: "/book-app/prod/VITE_API_URL"
-    VITE_OPENAI_API_KEY: "/book-app/prod/VITE_OPENAI_API_KEY"
 ```
 
 즉, `main` 브랜치 push나 merge로 CodePipeline이 실행되면:
@@ -300,13 +297,11 @@ AWS Console 또는 CLI에서 아래 파라미터를 한 번 만들어 두세요.
 
 ```text
 /book-app/prod/VITE_API_URL
-/book-app/prod/VITE_OPENAI_API_KEY
 ```
 
 권장값 유형:
 
 - `VITE_API_URL`: `String`
-- `VITE_OPENAI_API_KEY`: `SecureString`
 
 또한 CodeBuild 서비스 역할에 아래 권한이 있어야 합니다.
 
@@ -315,4 +310,3 @@ AWS Console 또는 CLI에서 아래 파라미터를 한 번 만들어 두세요.
 ### 4. 확인 포인트
 
 - 프런트엔드 정적 배포물은 빌드 후 값이 고정되므로, 환경변수를 바꾼 뒤에는 반드시 파이프라인을 다시 실행해야 합니다.
-- `VITE_OPENAI_API_KEY`는 브라우저 번들에 포함될 수 있으므로, 실제 운영 환경에서는 프런트에서 직접 사용하지 않도록 서버 프록시 방식으로 전환하는 것을 권장합니다.
