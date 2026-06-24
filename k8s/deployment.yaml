@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-app
+  namespace: bookapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: book-app
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: book-app
+    spec:
+      containers:
+      - name: book-app
+        image: 416225317325.dkr.ecr.ap-southeast-2.amazonaws.com/user112-bookapp-frontend:625efb75c1ab
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 512Mi
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
