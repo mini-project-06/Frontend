@@ -103,7 +103,7 @@ function Header() {
       {/* 왼쪽: 로고 + 버튼 */}
       <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
         <h1 onClick={() => navigate("/")} style={{ margin: 0 }}>
-          📚 오늘의 서재^^
+          📚 오늘의 서재
         </h1>
         <div
           style={{
